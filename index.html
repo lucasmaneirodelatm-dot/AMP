@@ -1,0 +1,3138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asensio Maneiro Pallares</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            box-sizing: border-box;
+        }
+        .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .cart-badge { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .admin-panel { display: none; }
+        .admin-panel.show { display: block; }
+        .notification-badge { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .notification-item { transition: all 0.3s ease; }
+        .notification-item:hover { background-color: #f9fafb; }
+        .notification-item.unread { background-color: #eff6ff; border-left: 4px solid #3b82f6; }
+        .notification-item.read { opacity: 0.8; }
+        .notification-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .notification-icon.bienvenida { background-color: #dcfce7; color: #16a34a; }
+        .notification-icon.promocion { background-color: #fef3c7; color: #d97706; }
+        .notification-icon.evento { background-color: #e0e7ff; color: #6366f1; }
+        .notification-icon.pedido { background-color: #dbeafe; color: #2563eb; }
+        .notification-icon.sistema { background-color: #f3e8ff; color: #9333ea; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white font-bold text-xl">AMP</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-900">Asensio Maneiro Pallares</h1>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#inicio" onclick="scrollToSection('inicio')" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Inicio</a>
+                    <a href="#ofertas" onclick="scrollToSection('ofertas')" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Ofertas</a>
+                    <a href="#tiendas" onclick="scrollToSection('tiendas')" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Tiendas</a>
+                    <a href="#productos" onclick="scrollToSection('productos')" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Productos</a>
+                    <a href="#servicios" onclick="scrollToSection('servicios')" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Servicios</a>
+                    <a href="#eventos" onclick="scrollToSection('eventos')" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Eventos</a>
+                    <a href="#contacto" onclick="scrollToSection('contacto')" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Contacto</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications Button -->
+                    <button onclick="openNotifications()" class="relative p-2 text-gray-700 hover:text-purple-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span id="notification-count" class="notification-badge" style="display: none;">0</span>
+                    </button>
+                    
+                    <!-- Complaints Button (only for logged in users) -->
+                    <div id="complaints-button" style="display: none;">
+                        <button onclick="openComplaints()" class="relative p-2 text-gray-700 hover:text-purple-600 transition-colors" title="Mis Reclamaciones">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <button onclick="openCart()" class="relative p-2 text-gray-700 hover:text-purple-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+                        </svg>
+                        <span id="cart-count" class="cart-badge">0</span>
+                    </button>
+                    <div id="user-menu">
+                        <button onclick="openLoginModal()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors">Iniciar Sesión</button>
+                    </div>
+                </div>
+                <button class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-gradient text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-5xl font-bold mb-6">Bienvenido a CCLille</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">El destino de compras más moderno de la ciudad. Más de 200 tiendas, restaurantes y entretenimiento en un solo lugar.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="scrollToSection('tiendas')" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">Ver Tiendas</button>
+                <button onclick="showSchedule()" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition-colors">Horarios</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advertisement Banner -->
+    <div id="ad-banner" class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div id="ad-banner-content" class="text-center">
+                <!-- Advertisement will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content with Sidebar Ads -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar Ad -->
+            <div class="lg:col-span-1">
+                <div id="sidebar-ad" class="sticky top-24">
+                    <div id="sidebar-ad-content" class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <!-- Sidebar advertisement will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                <!-- Content sections will go here -->
+                <div class="space-y-16">
+                    <!-- Offers Section -->
+                    <section id="ofertas" class="py-12">
+                        <div class="text-center mb-12">
+                            <h2 class="text-4xl font-bold text-gray-900 mb-4">Ofertas Especiales</h2>
+                            <p class="text-xl text-gray-600">Descubre las mejores promociones de nuestras tiendas</p>
+                        </div>
+                        
+                        <!-- Inline Ad between offers -->
+                        <div id="inline-ad-1" class="mb-8">
+                            <div id="inline-ad-1-content" class="bg-gray-50 rounded-lg p-4 text-center">
+                                <!-- Inline advertisement will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-red-500 to-pink-500"></div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold mb-2">Hasta 50% OFF</h3>
+                                    <p class="text-gray-600 mb-4">En toda la colección de moda</p>
+                                    <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">Ver Ofertas</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold mb-2">Tecnología</h3>
+                                    <p class="text-gray-600 mb-4">Los últimos gadgets con descuento</p>
+                                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Explorar</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-green-500 to-emerald-500"></div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold mb-2">Deportes</h3>
+                                    <p class="text-gray-600 mb-4">Equipamiento deportivo premium</p>
+                                    <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">Comprar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Stores Section -->
+                    <section id="tiendas" class="py-12">
+                        <div class="text-center mb-12">
+                            <h2 class="text-4xl font-bold text-gray-900 mb-4">Nuestras Tiendas</h2>
+                            <p class="text-xl text-gray-600">Más de 200 tiendas esperándote</p>
+                        </div>
+                        
+                        <div id="stores-display" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <!-- Stores will be loaded here -->
+                        </div>
+                    </section>
+
+                    <!-- Products Section -->
+                    <section id="productos" class="py-12">
+                        <div class="text-center mb-12">
+                            <h2 class="text-4xl font-bold text-gray-900 mb-4">Productos Destacados</h2>
+                            <p class="text-xl text-gray-600">Lo mejor de nuestras tiendas</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                                    <span class="text-6xl">👗</span>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-semibold mb-2">Vestido Elegante</h4>
+                                    <p class="text-gray-600 text-sm mb-2">Moda Elegante</p>
+                                    <p class="text-purple-600 font-bold">€89.99</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                                    <span class="text-6xl">📱</span>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-semibold mb-2">Smartphone Pro</h4>
+                                    <p class="text-gray-600 text-sm mb-2">TechWorld</p>
+                                    <p class="text-blue-600 font-bold">€699.99</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                                    <span class="text-6xl">⚽</span>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-semibold mb-2">Balón Profesional</h4>
+                                    <p class="text-gray-600 text-sm mb-2">SportZone</p>
+                                    <p class="text-green-600 font-bold">€45.99</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-yellow-500 to-orange-500 flex items-center justify-center">
+                                    <span class="text-6xl">🏠</span>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-semibold mb-2">Lámpara Moderna</h4>
+                                    <p class="text-gray-600 text-sm mb-2">Hogar & Deco</p>
+                                    <p class="text-yellow-600 font-bold">€129.99</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Services Section -->
+                    <section id="servicios" class="py-12">
+                        <div class="text-center mb-12">
+                            <h2 class="text-4xl font-bold text-gray-900 mb-4">Nuestros Servicios</h2>
+                            <p class="text-xl text-gray-600">Todo lo que necesitas en un solo lugar</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div class="bg-white rounded-lg shadow-md p-6 text-center card-hover">
+                                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-3xl">🅿️</span>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Aparcamiento Gratuito</h3>
+                                <p class="text-gray-600">Más de 2000 plazas de aparcamiento gratuito</p>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md p-6 text-center card-hover">
+                                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-3xl">🍽️</span>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Zona de Restauración</h3>
+                                <p class="text-gray-600">Más de 30 restaurantes y cafeterías</p>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md p-6 text-center card-hover">
+                                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-3xl">🎬</span>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Cine Multiplex</h3>
+                                <p class="text-gray-600">12 salas con la última tecnología</p>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md p-6 text-center card-hover">
+                                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-3xl">🛡️</span>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Seguridad 24/7</h3>
+                                <p class="text-gray-600">Personal de seguridad las 24 horas</p>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md p-6 text-center card-hover">
+                                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-3xl">📶</span>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">WiFi Gratuito</h3>
+                                <p class="text-gray-600">Internet de alta velocidad en todo el centro</p>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md p-6 text-center card-hover">
+                                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-3xl">🎪</span>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Zona Infantil</h3>
+                                <p class="text-gray-600">Área de juegos para los más pequeños</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Events Section -->
+                    <section id="eventos" class="py-12">
+                        <div class="text-center mb-12">
+                            <h2 class="text-4xl font-bold text-gray-900 mb-4">Próximos Eventos</h2>
+                            <p class="text-xl text-gray-600">No te pierdas nuestras actividades especiales</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center">
+                                    <span class="text-6xl">🎉</span>
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold mb-2">Festival de Moda</h3>
+                                    <p class="text-gray-600 mb-4">Desfile de las últimas tendencias con descuentos especiales</p>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <span class="mr-4">📅 15-17 Febrero</span>
+                                        <span>🕐 10:00 - 20:00</span>
+                                    </div>
+                                    <button class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors">Más Info</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                                <div class="h-48 bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
+                                    <span class="text-6xl">🎮</span>
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold mb-2">Gaming Weekend</h3>
+                                    <p class="text-gray-600 mb-4">Torneo de videojuegos con premios increíbles</p>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <span class="mr-4">📅 22-24 Febrero</span>
+                                        <span>🕐 12:00 - 22:00</span>
+                                    </div>
+                                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Inscribirse</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Contact Section -->
+                    <section id="contacto" class="py-12">
+                        <div class="text-center mb-12">
+                            <h2 class="text-4xl font-bold text-gray-900 mb-4">Contacto</h2>
+                            <p class="text-xl text-gray-600">Estamos aquí para ayudarte</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-white rounded-lg shadow-md p-8">
+                                <h3 class="text-2xl font-semibold mb-6">Información de Contacto</h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-center">
+                                        <span class="text-2xl mr-4">📍</span>
+                                        <div>
+                                            <p class="font-medium">Dirección</p>
+                                            <p class="text-gray-600">Av. Principal 123, Lille, Francia</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="text-2xl mr-4">📞</span>
+                                        <div>
+                                            <p class="font-medium">Teléfono</p>
+                                            <p class="text-gray-600">+33 1 23 45 67 89</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="text-2xl mr-4">✉️</span>
+                                        <div>
+                                            <p class="font-medium">Email</p>
+                                            <p class="text-gray-600">info@cclille.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="text-2xl mr-4">🕐</span>
+                                        <div>
+                                            <p class="font-medium">Horarios</p>
+                                            <p class="text-gray-600">Lun-Sáb: 10:00-22:00</p>
+                                            <p class="text-gray-600">Dom: 11:00-20:00</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow-md p-8">
+                                <h3 class="text-2xl font-semibold mb-6">Envíanos un Mensaje</h3>
+                                <form class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                        <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Mensaje</label>
+                                        <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                                    </div>
+                                    <button type="submit" class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors">Enviar Mensaje</button>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Another inline ad -->
+                    <div id="inline-ad-2" class="py-8">
+                        <div id="inline-ad-2-content" class="bg-gray-50 rounded-lg p-4 text-center">
+                            <!-- Another inline advertisement will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Iniciar Sesión</h3>
+                <button onclick="closeLoginModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label for="email-login" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="email-login" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div class="mb-6">
+                    <label for="password-login" class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" id="password-login" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-4">Iniciar Sesión</button>
+            </form>
+            <div class="text-center">
+                <p class="text-gray-600 mb-2">¿No tienes cuenta?</p>
+                <button onclick="showRegister()" class="text-purple-600 hover:text-purple-700 font-medium">Crear cuenta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Crear Cuenta</h3>
+                <button onclick="closeRegisterModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label for="name-register" class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                    <input type="text" id="name-register" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label for="email-register" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="email-register" required placeholder="ejemplo@email.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">📧 Usa cualquier email válido. Los emails @cclille.com tienen privilegios de administrador</p>
+                </div>
+                <div class="mb-6">
+                    <label for="password-register" class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" id="password-register" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-4">Crear Cuenta</button>
+            </form>
+            <div class="text-center">
+                <button onclick="showLogin()" class="text-purple-600 hover:text-purple-700 font-medium">¿Ya tienes cuenta? Inicia sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaints Modal -->
+    <div id="complaintsModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Mis Reclamaciones</h3>
+                <button onclick="closeComplaints()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button onclick="showComplaintsTab('list')" id="tab-list" class="px-4 py-2 font-medium text-purple-600 border-b-2 border-purple-600">Mis Reclamaciones</button>
+                <button onclick="showComplaintsTab('new')" id="tab-new" class="px-4 py-2 font-medium text-gray-500 hover:text-gray-700 ml-4">Nueva Reclamación</button>
+                <div id="admin-tab" style="display: none;">
+                    <button onclick="showComplaintsTab('admin')" id="tab-admin" class="px-4 py-2 font-medium text-gray-500 hover:text-gray-700 ml-4">Gestión Admin</button>
+                </div>
+            </div>
+
+            <!-- Complaints List Tab -->
+            <div id="complaints-list-tab" class="tab-content">
+                <div id="userComplaintsList">
+                    <!-- User complaints will be loaded here -->
+                </div>
+            </div>
+
+            <!-- New Complaint Tab -->
+            <div id="complaints-new-tab" class="tab-content" style="display: none;">
+                <div class="max-w-2xl">
+                    <h4 class="text-lg font-semibold mb-4">Presentar Nueva Reclamación</h4>
+                    <form onsubmit="submitComplaint(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Reclamación</label>
+                            <select id="complaintType" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Seleccionar tipo</option>
+                                <option value="servicio">Problema con Servicio al Cliente</option>
+                                <option value="producto">Producto Defectuoso</option>
+                                <option value="tienda">Problema con Tienda</option>
+                                <option value="instalaciones">Instalaciones del Centro</option>
+                                <option value="seguridad">Seguridad</option>
+                                <option value="limpieza">Limpieza</option>
+                                <option value="otros">Otros</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tienda Relacionada (opcional)</label>
+                            <select id="complaintStore" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">No aplica / Seleccionar tienda</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+                            <select id="complaintPriority" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="baja">Baja - No urgente</option>
+                                <option value="media" selected>Media - Atención normal</option>
+                                <option value="alta">Alta - Requiere atención pronta</option>
+                                <option value="critica">Crítica - Urgente</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Asunto</label>
+                            <input type="text" id="complaintSubject" required maxlength="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Resumen breve del problema">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Descripción Detallada</label>
+                            <textarea id="complaintDescription" required rows="6" maxlength="1000" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Describe detalladamente lo ocurrido, incluyendo fecha, hora y cualquier información relevante..."></textarea>
+                            <p class="text-xs text-gray-500 mt-1">Máximo 1000 caracteres</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">¿Qué solución esperas?</label>
+                            <textarea id="complaintSolution" rows="3" maxlength="500" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Describe qué tipo de solución o respuesta esperas..."></textarea>
+                        </div>
+
+                        <div class="flex items-center">
+                            <input type="checkbox" id="complaintTerms" required class="mr-2">
+                            <label for="complaintTerms" class="text-sm text-gray-700">Acepto que la información proporcionada es veraz y autorizo su tratamiento para resolver mi reclamación</label>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">Enviar Reclamación</button>
+                            <button type="button" onclick="resetComplaintForm()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">Limpiar Formulario</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Admin Management Tab -->
+            <div id="complaints-admin-tab" class="tab-content" style="display: none;">
+                <div id="adminComplaintsList">
+                    <!-- Admin complaints management will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web Updates Modal -->
+    <div id="webUpdatesModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Gestión de Actualizaciones Web</h3>
+                <button onclick="closeWebUpdates()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Current Update Status -->
+            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 class="font-semibold text-blue-800 mb-2">📊 Estado Actual</h4>
+                <div id="updateStatus" class="text-blue-700">
+                    <!-- Status will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Configure New Update -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-4">🔄 Configurar Nueva Actualización</h4>
+                <form onsubmit="configureWebUpdate(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Título de la Actualización</label>
+                            <input type="text" id="updateTitle" required maxlength="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ej: Nueva versión disponible">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Actualización</label>
+                            <select id="updateType" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">Seleccionar tipo</option>
+                                <option value="feature">Nueva Funcionalidad</option>
+                                <option value="improvement">Mejora</option>
+                                <option value="bugfix">Corrección de Errores</option>
+                                <option value="maintenance">Mantenimiento</option>
+                                <option value="security">Actualización de Seguridad</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                        <textarea id="updateDescription" required rows="3" maxlength="500" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Describe brevemente qué incluye esta actualización..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">URL de Actualización *</label>
+                            <input type="url" id="updateUrl" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="https://ejemplo.com/nueva-version">
+                            <p class="text-xs text-gray-500 mt-1">URL donde los usuarios pueden acceder a la actualización</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+                            <select id="updatePriority" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="low">Baja - Opcional</option>
+                                <option value="medium" selected>Media - Recomendada</option>
+                                <option value="high">Alta - Importante</option>
+                                <option value="critical">Crítica - Obligatoria</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Publicación</label>
+                            <input type="datetime-local" id="updatePublishDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Expiración (opcional)</label>
+                            <input type="datetime-local" id="updateExpiryDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="updateAutoShow" checked class="mr-2">
+                            <span class="text-sm">Mostrar automáticamente a usuarios al iniciar sesión</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="updateForceUpdate" class="mr-2">
+                            <span class="text-sm">Actualización obligatoria (bloquea el uso hasta actualizar)</span>
+                        </label>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">Configurar Actualización</button>
+                        <button type="button" onclick="testUpdateNotification()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">Vista Previa</button>
+                        <button type="button" onclick="clearUpdateForm()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">Limpiar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Active Updates List -->
+            <div>
+                <h4 class="text-lg font-semibold mb-4">📋 Actualizaciones Activas</h4>
+                <div id="activeUpdatesList">
+                    <!-- Active updates will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ads Manager Modal -->
+    <div id="adsManagerModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Gestión de Anuncios</h3>
+                <button onclick="closeAdsManager()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Ads Statistics Dashboard -->
+            <div class="mb-8 p-6 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                <h4 class="font-semibold text-orange-800 mb-4">📊 Estadísticas de Anuncios</h4>
+                <div id="adsStats" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Stats will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Upload New Ad -->
+            <div class="mb-8 p-6 bg-gray-50 rounded-lg">
+                <h4 class="text-lg font-semibold mb-4">📤 Subir Nuevo Anuncio</h4>
+                <form onsubmit="uploadAd(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Título del Anuncio</label>
+                            <input type="text" id="adTitle" required maxlength="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" placeholder="ej: Gran Oferta de Verano">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Posición</label>
+                            <select id="adPosition" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                                <option value="">Seleccionar posición</option>
+                                <option value="banner">Banner Superior</option>
+                                <option value="sidebar">Barra Lateral</option>
+                                <option value="inline-1">Entre Contenido 1</option>
+                                <option value="inline-2">Entre Contenido 2</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                        <textarea id="adDescription" rows="2" maxlength="200" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" placeholder="Descripción breve del anuncio..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Archivo de Imagen/GIF</label>
+                            <input type="file" id="adFile" accept="image/*,.gif" required onchange="previewAdFile(this)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                            <p class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, GIF. Tamaño máximo: 5MB</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">URL de Destino (opcional)</label>
+                            <input type="url" id="adUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" placeholder="https://ejemplo.com">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+                            <select id="adPriority" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                                <option value="low">Baja</option>
+                                <option value="medium" selected>Media</option>
+                                <option value="high">Alta</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Inicio</label>
+                            <input type="datetime-local" id="adStartDate" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Fin</label>
+                            <input type="datetime-local" id="adEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+                        </div>
+                    </div>
+
+                    <div id="adPreview" class="mt-4" style="display: none;">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Vista Previa:</label>
+                        <div class="border border-gray-300 rounded-lg p-4 bg-white">
+                            <img id="adPreviewImg" class="max-w-full h-auto rounded" alt="Vista previa del anuncio">
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="submit" class="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition-colors">Subir Anuncio</button>
+                        <button type="button" onclick="clearAdForm()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">Limpiar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Active Ads List -->
+            <div>
+                <h4 class="text-lg font-semibold mb-4">📋 Anuncios Activos</h4>
+                <div id="activeAdsList">
+                    <!-- Active ads will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Notification Modal -->
+    <div id="updateNotificationModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </div>
+                <h3 id="updateNotificationTitle" class="text-xl font-bold text-gray-900 mb-2">Nueva Actualización Disponible</h3>
+                <div id="updateNotificationBadge" class="inline-block px-3 py-1 rounded-full text-xs font-medium mb-4">
+                    <!-- Priority badge will be set here -->
+                </div>
+                <p id="updateNotificationDescription" class="text-gray-600 mb-6">
+                    <!-- Description will be set here -->
+                </p>
+                <div class="flex space-x-3">
+                    <button id="updateNotificationButton" onclick="goToUpdate()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Actualizar Ahora
+                    </button>
+                    <button id="updateNotificationLater" onclick="closeUpdateNotification()" class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                        Más Tarde
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-3">
+                    Esta notificación se puede desactivar en configuración
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Manager Modal -->
+    <div id="userManagerModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Gestión de Usuarios</h3>
+                <button onclick="closeUserManager()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- User Statistics -->
+            <div class="mb-8 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg">
+                <h4 class="font-semibold text-indigo-800 mb-4">📊 Estadísticas de Usuarios</h4>
+                <div id="userStats" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Stats will be loaded here -->
+                </div>
+            </div>
+
+            <!-- User Filters -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-lg font-semibold mb-4">🔍 Filtros y Búsqueda</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Usuario</label>
+                        <input type="text" id="userSearch" placeholder="Nombre o email..." onkeyup="filterUsers()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+                        <select id="roleFilter" onchange="filterUsers()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Todos los roles</option>
+                            <option value="admin">Administradores</option>
+                            <option value="user">Usuarios</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <select id="statusFilter" onchange="filterUsers()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Todos los estados</option>
+                            <option value="active">Activos</option>
+                            <option value="inactive">Inactivos</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="clearUserFilters()" class="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">Limpiar Filtros</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users List -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-lg font-semibold">👥 Lista de Usuarios</h4>
+                    <div class="flex space-x-2">
+                        <button onclick="exportUsers()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">📊 Exportar</button>
+                        <button onclick="showAddUserForm()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">➕ Nuevo Usuario</button>
+                    </div>
+                </div>
+                <div id="usersList">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Crear Nuevo Usuario</h3>
+                <button onclick="closeAddUserModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="createUser(event)">
+                <div class="mb-4">
+                    <label for="newUserName" class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                    <input type="text" id="newUserName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label for="newUserEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="newUserEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label for="newUserRole" class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+                    <select id="newUserRole" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="user">Usuario Regular</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label for="newUserBalance" class="block text-sm font-medium text-gray-700 mb-2">Saldo Inicial (€)</label>
+                    <input type="number" id="newUserBalance" min="0" step="0.01" value="100.00" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" class="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Crear Usuario</button>
+                    <button type="button" onclick="closeAddUserModal()" class="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-700 transition-colors">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Store Manager Modal -->
+    <div id="storeManagerModal" class="modal">
+        <div class="bg-white rounded-lg p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Gestión de Tiendas</h3>
+                <button onclick="closeStoreManager()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <button onclick="showAddStoreForm()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">Agregar Nueva Tienda</button>
+            </div>
+
+            <!-- Add Store Form -->
+            <div id="addStoreForm" style="display: none;" class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-lg font-semibold mb-4">Agregar Nueva Tienda</h4>
+                <form onsubmit="addStore(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de la Tienda</label>
+                        <input type="text" id="storeName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+                        <select id="storeCategory" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="">Seleccionar categoría</option>
+                            <option value="moda">Moda</option>
+                            <option value="tech">Tecnología</option>
+                            <option value="deporte">Deporte</option>
+                            <option value="hogar">Hogar</option>
+                            <option value="comida">Comida</option>
+                            <option value="entretenimiento">Entretenimiento</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Piso</label>
+                        <select id="storeFloor" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="">Seleccionar piso</option>
+                            <option value="1">Piso 1</option>
+                            <option value="2">Piso 2</option>
+                            <option value="3">Piso 3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Local</label>
+                        <input type="text" id="storeLocal" placeholder="ej: 105" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                        <textarea id="storeDescription" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Logo de la Tienda</label>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="logoType" value="emoji" checked onchange="toggleLogoType()" class="mr-2">
+                                    <span class="text-sm">Usar Emoji</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="logoType" value="image" onchange="toggleLogoType()" class="mr-2">
+                                    <span class="text-sm">Subir Imagen</span>
+                                </label>
+                            </div>
+                            
+                            <div id="emojiInput">
+                                <input type="text" id="storeIcon" placeholder="🏪" maxlength="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <p class="text-xs text-gray-500 mt-1">Escribe un emoji para representar la tienda</p>
+                            </div>
+                            
+                            <div id="imageInput" style="display: none;">
+                                <input type="file" id="storeImage" accept="image/*" onchange="previewImage(this)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <p class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, GIF. Tamaño máximo: 2MB</p>
+                                <div id="imagePreview" class="mt-2" style="display: none;">
+                                    <img id="previewImg" class="w-16 h-16 object-cover rounded-lg border" alt="Vista previa">
+                                    <button type="button" onclick="removeImage()" class="ml-2 text-red-600 hover:text-red-800 text-sm">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sitio Web (opcional)</label>
+                        <input type="url" id="storeWebsite" placeholder="https://ejemplo.com" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <p class="text-xs text-gray-500 mt-1">URL del sitio web de la tienda</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <select id="storeStatus" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="activa">Activa</option>
+                            <option value="mantenimiento">En Mantenimiento</option>
+                            <option value="cerrada">Cerrada Temporalmente</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors mr-2">Agregar Tienda</button>
+                        <button type="button" onclick="hideAddStoreForm()" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Stores List -->
+            <div id="storesList">
+                <!-- Stores will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let users = [
+            {
+                id: 1,
+                name: "Admin",
+                email: "admin@cclille.com",
+                role: "admin",
+                balance: 1000.00,
+                purchases: 0,
+                active: true,
+                accountNumber: "ES21 1234 5678 9012 3456 7890"
+            }
+        ];
+        let nextUserId = 2;
+
+        // User management variables
+        let filteredUsers = [];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserSession();
+            checkForUpdates();
+            displayStoresInSection();
+        });
+
+        // User Management Functions
+        function openUserManager() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Acceso denegado. Solo administradores pueden gestionar usuarios.');
+                return;
+            }
+            document.getElementById('userManagerModal').classList.add('show');
+            loadUserStats();
+            loadUsersList();
+        }
+
+        function closeUserManager() {
+            document.getElementById('userManagerModal').classList.remove('show');
+        }
+
+        function showAddUserForm() {
+            document.getElementById('addUserModal').classList.add('show');
+        }
+
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').classList.remove('show');
+            // Clear form
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserEmail').value = '';
+            document.getElementById('newUserRole').value = 'user';
+            document.getElementById('newUserBalance').value = '100.00';
+        }
+
+        function loadUserStats() {
+            const totalUsers = users.length;
+            const activeUsers = users.filter(u => u.active).length;
+            const adminUsers = users.filter(u => u.role === 'admin').length;
+            const totalBalance = users.reduce((sum, u) => sum + u.balance, 0);
+
+            document.getElementById('userStats').innerHTML = `
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-indigo-600">${totalUsers}</div>
+                    <div class="text-sm text-gray-600">Total Usuarios</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600">${activeUsers}</div>
+                    <div class="text-sm text-gray-600">Usuarios Activos</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-purple-600">${adminUsers}</div>
+                    <div class="text-sm text-gray-600">Administradores</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-orange-600">€${totalBalance.toFixed(2)}</div>
+                    <div class="text-sm text-gray-600">Saldo Total</div>
+                </div>
+            `;
+        }
+
+        function loadUsersList() {
+            filteredUsers = [...users];
+            displayUsers();
+        }
+
+        function displayUsers() {
+            const container = document.getElementById('usersList');
+            
+            if (filteredUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <p class="text-lg font-medium">No se encontraron usuarios</p>
+                        <p class="text-sm">Ajusta los filtros o crea un nuevo usuario</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registro</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${filteredUsers.map(user => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 bg-gradient-to-r ${user.role === 'admin' ? 'from-purple-500 to-indigo-500' : 'from-blue-500 to-cyan-500'} rounded-full flex items-center justify-center mr-3">
+                                                <span class="text-white font-semibold text-sm">${user.name.charAt(0).toUpperCase()}</span>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                                                <div class="text-sm text-gray-500">${user.email}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">
+                                            ${user.role === 'admin' ? '👑 Admin' : '👤 Usuario'}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        €${user.balance.toFixed(2)}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full ${user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                            ${user.active ? '✅ Activo' : '❌ Inactivo'}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        ${user.registeredAt ? user.registeredAt.toLocaleDateString('es-ES') : 'N/A'}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div class="flex space-x-2">
+                                            <button onclick="editUserBalance(${user.id})" class="text-green-600 hover:text-green-900" title="Editar Saldo">
+                                                💰
+                                            </button>
+                                            <button onclick="toggleUserStatus(${user.id})" class="text-${user.active ? 'red' : 'green'}-600 hover:text-${user.active ? 'red' : 'green'}-900" title="${user.active ? 'Desactivar' : 'Activar'}">
+                                                ${user.active ? '🚫' : '✅'}
+                                            </button>
+                                            <button onclick="changeUserRole(${user.id})" class="text-purple-600 hover:text-purple-900" title="Cambiar Rol">
+                                                🔄
+                                            </button>
+                                            ${user.id !== currentUser.id ? `<button onclick="deleteUser(${user.id})" class="text-red-600 hover:text-red-900" title="Eliminar">🗑️</button>` : ''}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const roleFilter = document.getElementById('roleFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            filteredUsers = users.filter(user => {
+                const matchesSearch = user.name.toLowerCase().includes(searchTerm) || 
+                                    user.email.toLowerCase().includes(searchTerm);
+                const matchesRole = !roleFilter || user.role === roleFilter;
+                const matchesStatus = !statusFilter || 
+                                    (statusFilter === 'active' && user.active) || 
+                                    (statusFilter === 'inactive' && !user.active);
+
+                return matchesSearch && matchesRole && matchesStatus;
+            });
+
+            displayUsers();
+        }
+
+        function clearUserFilters() {
+            document.getElementById('userSearch').value = '';
+            document.getElementById('roleFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            loadUsersList();
+        }
+
+        function createUser(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('newUserName').value;
+            const email = document.getElementById('newUserEmail').value;
+            const role = document.getElementById('newUserRole').value;
+            const balance = parseFloat(document.getElementById('newUserBalance').value);
+
+            // Check if user already exists
+            if (users.find(u => u.email === email)) {
+                alert('❌ Ya existe un usuario con este email');
+                return;
+            }
+
+            const newUser = {
+                id: nextUserId++,
+                name: name,
+                email: email,
+                role: role,
+                balance: balance,
+                purchases: 0,
+                active: true,
+                accountNumber: generateAccountNumber(),
+                registeredAt: new Date()
+            };
+
+            users.push(newUser);
+            loadUserStats();
+            loadUsersList();
+            closeAddUserModal();
+            alert('✅ Usuario creado exitosamente');
+        }
+
+        function editUserBalance(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            const newBalance = prompt(`Editar saldo de ${user.name}\nSaldo actual: €${user.balance.toFixed(2)}\n\nIngresa el nuevo saldo:`, user.balance.toFixed(2));
+            
+            if (newBalance !== null) {
+                const balance = parseFloat(newBalance);
+                if (isNaN(balance) || balance < 0) {
+                    alert('❌ Por favor ingresa un saldo válido');
+                    return;
+                }
+                
+                user.balance = balance;
+                loadUserStats();
+                displayUsers();
+                
+                // Update current user if it's the same
+                if (user.id === currentUser.id) {
+                    currentUser.balance = balance;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    updateUserInterface();
+                }
+                
+                alert(`✅ Saldo actualizado: €${balance.toFixed(2)}`);
+            }
+        }
+
+        function toggleUserStatus(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            if (user.id === currentUser.id) {
+                alert('❌ No puedes desactivar tu propia cuenta');
+                return;
+            }
+
+            user.active = !user.active;
+            loadUserStats();
+            displayUsers();
+            alert(`✅ Usuario ${user.active ? 'activado' : 'desactivado'} exitosamente`);
+        }
+
+        function changeUserRole(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            const newRole = user.role === 'admin' ? 'user' : 'admin';
+            
+            if (confirm(`¿Cambiar el rol de ${user.name} de ${user.role === 'admin' ? 'Administrador' : 'Usuario'} a ${newRole === 'admin' ? 'Administrador' : 'Usuario'}?`)) {
+                user.role = newRole;
+                loadUserStats();
+                displayUsers();
+                
+                // Update current user if it's the same
+                if (user.id === currentUser.id) {
+                    currentUser.role = newRole;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    updateUserInterface();
+                }
+                
+                alert(`✅ Rol cambiado a ${newRole === 'admin' ? 'Administrador' : 'Usuario'}`);
+            }
+        }
+
+        function deleteUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            if (user.id === currentUser.id) {
+                alert('❌ No puedes eliminar tu propia cuenta');
+                return;
+            }
+
+            if (confirm(`¿Estás seguro de que quieres eliminar al usuario "${user.name}"?\n\nEsta acción no se puede deshacer.`)) {
+                users = users.filter(u => u.id !== userId);
+                loadUserStats();
+                loadUsersList();
+                alert('✅ Usuario eliminado exitosamente');
+            }
+        }
+
+        function exportUsers() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "ID,Nombre,Email,Rol,Saldo,Estado,Fecha Registro\n" +
+                users.map(user => 
+                    `${user.id},"${user.name}","${user.email}",${user.role},${user.balance.toFixed(2)},${user.active ? 'Activo' : 'Inactivo'},"${user.registeredAt ? user.registeredAt.toLocaleDateString('es-ES') : 'N/A'}"`
+                ).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `usuarios_cclille_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('✅ Lista de usuarios exportada exitosamente');
+        }
+
+        // User session management
+        function checkUserSession() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserInterface();
+            }
+        }
+
+        function updateUserInterface() {
+            const userMenu = document.getElementById('user-menu');
+            const complaintsButton = document.getElementById('complaints-button');
+            
+            if (currentUser) {
+                userMenu.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-700">Hola, ${currentUser.name}</span>
+                        <span class="text-sm text-purple-600 font-medium">€${currentUser.balance.toFixed(2)}</span>
+                        <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors">Cerrar Sesión</button>
+                    </div>
+                `;
+                
+                // Show complaints button for logged in users
+                if (complaintsButton) {
+                    complaintsButton.style.display = 'block';
+                }
+            } else {
+                userMenu.innerHTML = `
+                    <button onclick="openLoginModal()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors">Iniciar Sesión</button>
+                `;
+                if (complaintsButton) {
+                    complaintsButton.style.display = 'none';
+                }
+            }
+        }
+
+        // Modal functions
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+        }
+
+        function openRegisterModal() {
+            document.getElementById('registerModal').classList.add('show');
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.remove('show');
+        }
+
+        function showRegister() {
+            closeLoginModal();
+            openRegisterModal();
+        }
+
+        function showLogin() {
+            closeRegisterModal();
+            openLoginModal();
+        }
+
+        // Authentication functions
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email-login').value;
+            const password = document.getElementById('password-login').value;
+            
+            // Find user
+            const user = users.find(u => u.email === email);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUserInterface();
+                closeLoginModal();
+                
+                // Show success message
+                alert('¡Bienvenido de vuelta!');
+                
+                // Clear form
+                document.getElementById('email-login').value = '';
+                document.getElementById('password-login').value = '';
+            } else {
+                alert('Email o contraseña incorrectos');
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name-register').value;
+            const email = document.getElementById('email-register').value;
+            const password = document.getElementById('password-register').value;
+            
+            // Validate required fields
+            if (!name.trim() || !email.trim() || !password.trim()) {
+                alert('❌ Error: Todos los campos son obligatorios');
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('❌ Error: Por favor ingresa un email válido');
+                return;
+            }
+            
+            // Check if user already exists
+            if (users.find(u => u.email === email)) {
+                alert('❌ Ya existe una cuenta con este email');
+                return;
+            }
+            
+            // Create new user - Allow any email domain
+            const newUser = {
+                id: nextUserId++,
+                name: name,
+                email: email,
+                role: email.endsWith('@cclille.com') ? 'admin' : 'user',
+                balance: email.endsWith('@cclille.com') ? 1000.00 : 100.00,
+                purchases: 0,
+                active: true,
+                accountNumber: generateAccountNumber(),
+                registeredAt: new Date()
+            };
+            
+            users.push(newUser);
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            updateUserInterface();
+            closeRegisterModal();
+            
+            // Show success message
+            alert(`✅ ¡Cuenta creada exitosamente! ${newUser.role === 'admin' ? 'Tienes privilegios de administrador.' : 'Bienvenido a CCLille.'}`);
+            
+            // Clear form
+            document.getElementById('name-register').value = '';
+            document.getElementById('email-register').value = '';
+            document.getElementById('password-register').value = '';
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserInterface();
+            alert('Sesión cerrada correctamente');
+        }
+
+        function generateAccountNumber() {
+            const randomNum = Math.floor(Math.random() * 1000000000000).toString().padStart(12, '0');
+            return `ES21 1234 ${randomNum.substring(0, 4)} ${randomNum.substring(4, 8)} ${randomNum.substring(8, 12)}`;
+        }
+
+        // Store management variables
+        let stores = [
+            {
+                id: 1,
+                name: "Moda Elegante",
+                category: "moda",
+                floor: "1",
+                local: "105",
+                description: "Ropa y accesorios de última moda",
+                icon: "👗",
+                logoType: "emoji",
+                logoImage: null,
+                website: "https://modaelegante.com",
+                status: "activa",
+                color: "red"
+            },
+            {
+                id: 2,
+                name: "TechWorld",
+                category: "tech",
+                floor: "2",
+                local: "201",
+                description: "Electrónicos y gadgets",
+                icon: "📱",
+                logoType: "emoji",
+                logoImage: null,
+                website: "https://techworld.com",
+                status: "activa",
+                color: "blue"
+            },
+            {
+                id: 3,
+                name: "SportZone",
+                category: "deporte",
+                floor: "1",
+                local: "120",
+                description: "Artículos deportivos",
+                icon: "⚽",
+                logoType: "emoji",
+                logoImage: null,
+                website: "",
+                status: "activa",
+                color: "green"
+            },
+            {
+                id: 4,
+                name: "Hogar & Deco",
+                category: "hogar",
+                floor: "3",
+                local: "305",
+                description: "Decoración para el hogar",
+                icon: "🏠",
+                logoType: "emoji",
+                logoImage: null,
+                website: "https://hogardeco.es",
+                status: "activa",
+                color: "yellow"
+            }
+        ];
+        let nextStoreId = 5;
+
+        // Store management functions
+        function openStoreManager() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Acceso denegado. Solo administradores pueden gestionar tiendas.');
+                return;
+            }
+            document.getElementById('storeManagerModal').classList.add('show');
+            loadStoresList();
+        }
+
+        function closeStoreManager() {
+            document.getElementById('storeManagerModal').classList.remove('show');
+            hideAddStoreForm();
+        }
+
+        function showAddStoreForm() {
+            document.getElementById('addStoreForm').style.display = 'block';
+        }
+
+        function hideAddStoreForm() {
+            document.getElementById('addStoreForm').style.display = 'none';
+            document.getElementById('addStoreForm').querySelector('form').reset();
+        }
+
+        function addStore(event) {
+            event.preventDefault();
+            
+            const logoType = document.querySelector('input[name="logoType"]:checked').value;
+            const logoImage = logoType === 'image' ? document.getElementById('previewImg')?.src : null;
+            const icon = logoType === 'emoji' ? document.getElementById('storeIcon').value : '🏪';
+            
+            if (logoType === 'image' && !logoImage) {
+                alert('Por favor selecciona una imagen para el logo');
+                return;
+            }
+            
+            if (logoType === 'emoji' && !icon.trim()) {
+                alert('Por favor ingresa un emoji para el logo');
+                return;
+            }
+            
+            const newStore = {
+                id: nextStoreId++,
+                name: document.getElementById('storeName').value,
+                category: document.getElementById('storeCategory').value,
+                floor: document.getElementById('storeFloor').value,
+                local: document.getElementById('storeLocal').value,
+                description: document.getElementById('storeDescription').value,
+                icon: icon,
+                logoType: logoType,
+                logoImage: logoImage,
+                website: document.getElementById('storeWebsite').value,
+                status: document.getElementById('storeStatus').value,
+                color: getCategoryColor(document.getElementById('storeCategory').value)
+            };
+            
+            stores.push(newStore);
+            loadStoresList();
+            hideAddStoreForm();
+            alert('Tienda agregada exitosamente');
+        }
+
+        function getCategoryColor(category) {
+            const colors = {
+                'moda': 'red',
+                'tech': 'blue',
+                'deporte': 'green',
+                'hogar': 'yellow',
+                'comida': 'orange',
+                'entretenimiento': 'purple'
+            };
+            return colors[category] || 'gray';
+        }
+
+        function loadStoresList() {
+            const storesList = document.getElementById('storesList');
+            
+            if (stores.length === 0) {
+                storesList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <p class="text-lg font-medium">No hay tiendas registradas</p>
+                        <p class="text-sm">Agrega la primera tienda usando el botón de arriba</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            storesList.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${stores.map(store => `
+                        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-${store.color}-500">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-${store.color}-500 rounded-lg flex items-center justify-center mr-3 overflow-hidden ${store.website ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}" ${store.website ? `onclick="visitStoreWebsite('${store.website}')"` : ''} title="${store.website ? 'Clic para visitar sitio web' : ''}">
+                                        ${store.logoType === 'image' && store.logoImage ? 
+                                            `<img src="${store.logoImage}" alt="${store.name}" class="w-full h-full object-cover">` : 
+                                            `<span class="text-white text-xl">${store.icon}</span>`
+                                        }
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-gray-900 ${store.website ? 'cursor-pointer hover:text-purple-600 transition-colors' : ''}" ${store.website ? `onclick="visitStoreWebsite('${store.website}')"` : ''} title="${store.website ? 'Clic para visitar sitio web' : ''}">${store.name}</h4>
+                                        <p class="text-sm text-gray-600">Piso ${store.floor} - Local ${store.local}</p>
+                                        ${store.website ? `<p class="text-xs text-blue-600 hover:underline cursor-pointer" onclick="visitStoreWebsite('${store.website}')" title="Visitar sitio web">🌐 ${store.website}</p>` : ''}
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="editStore(${store.id})" class="text-blue-600 hover:text-blue-800 p-1" title="Editar">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <button onclick="deleteStore(${store.id})" class="text-red-600 hover:text-red-800 p-1" title="Eliminar">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-3">${store.description}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-${store.color}-600 bg-${store.color}-100 px-2 py-1 rounded-full">${store.category}</span>
+                                <span class="text-sm ${store.status === 'activa' ? 'text-green-600' : store.status === 'mantenimiento' ? 'text-yellow-600' : 'text-red-600'}">${getStatusText(store.status)}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Also update the main section display
+            displayStoresInSection();
+        }
+
+        function getStatusText(status) {
+            const statusTexts = {
+                'activa': '✅ Activa',
+                'mantenimiento': '🔧 Mantenimiento',
+                'cerrada': '❌ Cerrada'
+            };
+            return statusTexts[status] || status;
+        }
+
+        function editStore(storeId) {
+            const store = stores.find(s => s.id === storeId);
+            if (!store) return;
+            
+            // Fill form with store data
+            document.getElementById('storeName').value = store.name;
+            document.getElementById('storeCategory').value = store.category;
+            document.getElementById('storeFloor').value = store.floor;
+            document.getElementById('storeLocal').value = store.local;
+            document.getElementById('storeDescription').value = store.description;
+            document.getElementById('storeIcon').value = store.icon;
+            document.getElementById('storeWebsite').value = store.website || '';
+            document.getElementById('storeStatus').value = store.status;
+            
+            // Set logo type
+            const logoType = store.logoType || 'emoji';
+            document.querySelector(`input[name="logoType"][value="${logoType}"]`).checked = true;
+            toggleLogoType();
+            
+            // If it's an image, show preview
+            if (logoType === 'image' && store.logoImage) {
+                const preview = document.getElementById('imagePreview');
+                const img = document.getElementById('previewImg');
+                img.src = store.logoImage;
+                preview.style.display = 'block';
+            }
+            
+            // Show form and change submit behavior
+            showAddStoreForm();
+            
+            // Change form title and button
+            document.querySelector('#addStoreForm h4').textContent = 'Editar Tienda';
+            const submitButton = document.querySelector('#addStoreForm button[type="submit"]');
+            submitButton.textContent = 'Actualizar Tienda';
+            
+            // Change form handler
+            const form = document.querySelector('#addStoreForm form');
+            form.onsubmit = function(event) {
+                event.preventDefault();
+                updateStore(storeId);
+            };
+        }
+
+        function updateStore(storeId) {
+            const storeIndex = stores.findIndex(s => s.id === storeId);
+            if (storeIndex === -1) return;
+            
+            const logoType = document.querySelector('input[name="logoType"]:checked').value;
+            const logoImage = logoType === 'image' ? document.getElementById('previewImg')?.src : null;
+            const icon = logoType === 'emoji' ? document.getElementById('storeIcon').value : stores[storeIndex].icon;
+            
+            if (logoType === 'image' && !logoImage) {
+                alert('Por favor selecciona una imagen para el logo');
+                return;
+            }
+            
+            if (logoType === 'emoji' && !icon.trim()) {
+                alert('Por favor ingresa un emoji para el logo');
+                return;
+            }
+            
+            stores[storeIndex] = {
+                ...stores[storeIndex],
+                name: document.getElementById('storeName').value,
+                category: document.getElementById('storeCategory').value,
+                floor: document.getElementById('storeFloor').value,
+                local: document.getElementById('storeLocal').value,
+                description: document.getElementById('storeDescription').value,
+                icon: icon,
+                logoType: logoType,
+                logoImage: logoImage,
+                website: document.getElementById('storeWebsite').value,
+                status: document.getElementById('storeStatus').value,
+                color: getCategoryColor(document.getElementById('storeCategory').value)
+            };
+            
+            loadStoresList();
+            hideAddStoreForm();
+            resetStoreForm();
+            alert('Tienda actualizada exitosamente');
+        }
+
+        function deleteStore(storeId) {
+            const store = stores.find(s => s.id === storeId);
+            if (!store) return;
+            
+            if (confirm(`¿Estás seguro de que quieres eliminar la tienda "${store.name}"?`)) {
+                stores = stores.filter(s => s.id !== storeId);
+                loadStoresList();
+                alert('Tienda eliminada exitosamente');
+            }
+        }
+
+        function resetStoreForm() {
+            // Reset form title and button
+            document.querySelector('#addStoreForm h4').textContent = 'Agregar Nueva Tienda';
+            const submitButton = document.querySelector('#addStoreForm button[type="submit"]');
+            submitButton.textContent = 'Agregar Tienda';
+            
+            // Reset form handler
+            const form = document.querySelector('#addStoreForm form');
+            form.onsubmit = addStore;
+            
+            // Reset logo type
+            document.querySelector('input[name="logoType"][value="emoji"]').checked = true;
+            toggleLogoType();
+            removeImage();
+            
+            // Clear website field
+            document.getElementById('storeWebsite').value = '';
+        }
+
+        function toggleLogoType() {
+            const logoType = document.querySelector('input[name="logoType"]:checked').value;
+            const emojiInput = document.getElementById('emojiInput');
+            const imageInput = document.getElementById('imageInput');
+            
+            if (logoType === 'emoji') {
+                emojiInput.style.display = 'block';
+                imageInput.style.display = 'none';
+                document.getElementById('storeIcon').required = true;
+                document.getElementById('storeImage').required = false;
+            } else {
+                emojiInput.style.display = 'none';
+                imageInput.style.display = 'block';
+                document.getElementById('storeIcon').required = false;
+                document.getElementById('storeImage').required = true;
+            }
+        }
+
+        function previewImage(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Validate file size (2MB max)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('El archivo es demasiado grande. El tamaño máximo es 2MB.');
+                input.value = '';
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor selecciona un archivo de imagen válido.');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                const img = document.getElementById('previewImg');
+                
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage() {
+            const imageInput = document.getElementById('storeImage');
+            const preview = document.getElementById('imagePreview');
+            const img = document.getElementById('previewImg');
+            
+            imageInput.value = '';
+            img.src = '';
+            preview.style.display = 'none';
+        }
+
+        function visitStoreWebsite(url) {
+            if (url && url.trim()) {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+        }
+
+        // Update user interface to include admin panel
+        function updateUserInterface() {
+            const userMenu = document.getElementById('user-menu');
+            const complaintsButton = document.getElementById('complaints-button');
+            
+            if (currentUser) {
+                let adminButtons = '';
+                if (currentUser.role === 'admin') {
+                    adminButtons = `
+                        <button onclick="openUserManager()" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700 transition-colors">Usuarios</button>
+                        <button onclick="openStoreManager()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors">Tiendas</button>
+                        <button onclick="openWebUpdates()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors">Actualizaciones</button>
+                        <button onclick="openAdsManager()" class="bg-orange-600 text-white px-3 py-1 rounded text-sm hover:bg-orange-700 transition-colors">Anuncios</button>
+                    `;
+                }
+                
+                userMenu.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        ${adminButtons}
+                        <span class="text-gray-700">Hola, ${currentUser.name}</span>
+                        <span class="text-sm text-purple-600 font-medium">€${currentUser.balance.toFixed(2)}</span>
+                        <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors">Cerrar Sesión</button>
+                    </div>
+                `;
+                
+                // Show complaints button for logged in users
+                if (complaintsButton) {
+                    complaintsButton.style.display = 'block';
+                }
+            } else {
+                userMenu.innerHTML = `
+                    <button onclick="openLoginModal()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors">Iniciar Sesión</button>
+                `;
+                if (complaintsButton) {
+                    complaintsButton.style.display = 'none';
+                }
+            }
+        }
+
+        // Complaints management variables
+        let complaints = [
+            {
+                id: 1,
+                userId: 1,
+                userName: "Admin",
+                userEmail: "admin@cclille.com",
+                type: "instalaciones",
+                store: "",
+                priority: "media",
+                subject: "Problema con escaleras mecánicas",
+                description: "Las escaleras mecánicas del piso 2 hacen ruido extraño y van muy lentas",
+                solution: "Revisión técnica y reparación",
+                status: "pendiente",
+                createdAt: new Date('2024-01-15T10:30:00'),
+                updatedAt: new Date('2024-01-15T10:30:00'),
+                adminResponse: "",
+                adminNotes: ""
+            }
+        ];
+        let nextComplaintId = 2;
+
+        // Complaints functions
+        function openComplaints() {
+            if (!currentUser) {
+                alert('Debes iniciar sesión para ver tus reclamaciones');
+                return;
+            }
+            
+            document.getElementById('complaintsModal').classList.add('show');
+            
+            // Show admin tab if user is admin
+            const adminTab = document.getElementById('admin-tab');
+            if (currentUser.role === 'admin') {
+                adminTab.style.display = 'block';
+            } else {
+                adminTab.style.display = 'none';
+            }
+            
+            // Load stores in complaint form
+            loadStoresInComplaintForm();
+            
+            // Load user complaints
+            showComplaintsTab('list');
+        }
+
+        function closeComplaints() {
+            document.getElementById('complaintsModal').classList.remove('show');
+        }
+
+        function showComplaintsTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('[id^="tab-"]').forEach(t => {
+                t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
+                t.classList.add('text-gray-500');
+            });
+            
+            // Show selected tab
+            document.getElementById(`complaints-${tab}-tab`).style.display = 'block';
+            document.getElementById(`tab-${tab}`).classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
+            document.getElementById(`tab-${tab}`).classList.remove('text-gray-500');
+            
+            // Load content based on tab
+            if (tab === 'list') {
+                loadUserComplaints();
+            } else if (tab === 'admin') {
+                loadAdminComplaints();
+            }
+        }
+
+        function loadStoresInComplaintForm() {
+            const storeSelect = document.getElementById('complaintStore');
+            storeSelect.innerHTML = '<option value="">No aplica / Seleccionar tienda</option>';
+            
+            stores.forEach(store => {
+                const option = document.createElement('option');
+                option.value = store.id;
+                option.textContent = `${store.name} (Piso ${store.floor} - Local ${store.local})`;
+                storeSelect.appendChild(option);
+            });
+        }
+
+        function submitComplaint(event) {
+            event.preventDefault();
+            
+            const storeId = document.getElementById('complaintStore').value;
+            const storeName = storeId ? stores.find(s => s.id == storeId)?.name || '' : '';
+            
+            const newComplaint = {
+                id: nextComplaintId++,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                userEmail: currentUser.email,
+                type: document.getElementById('complaintType').value,
+                store: storeName,
+                priority: document.getElementById('complaintPriority').value,
+                subject: document.getElementById('complaintSubject').value,
+                description: document.getElementById('complaintDescription').value,
+                solution: document.getElementById('complaintSolution').value,
+                status: 'pendiente',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                adminResponse: '',
+                adminNotes: ''
+            };
+            
+            complaints.push(newComplaint);
+            
+            // Reset form
+            resetComplaintForm();
+            
+            // Show success message
+            alert('✅ Reclamación enviada exitosamente. Recibirás una respuesta en un plazo máximo de 48 horas.');
+            
+            // Switch to list tab
+            showComplaintsTab('list');
+        }
+
+        function resetComplaintForm() {
+            document.getElementById('complaintType').value = '';
+            document.getElementById('complaintStore').value = '';
+            document.getElementById('complaintPriority').value = 'media';
+            document.getElementById('complaintSubject').value = '';
+            document.getElementById('complaintDescription').value = '';
+            document.getElementById('complaintSolution').value = '';
+            document.getElementById('complaintTerms').checked = false;
+        }
+
+        function loadUserComplaints() {
+            const userComplaints = complaints.filter(c => c.userId === currentUser.id);
+            const container = document.getElementById('userComplaintsList');
+            
+            if (userComplaints.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes reclamaciones</h3>
+                        <p class="text-gray-500 mb-4">Cuando tengas algún problema, puedes crear una nueva reclamación</p>
+                        <button onclick="showComplaintsTab('new')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">Crear Primera Reclamación</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="space-y-4">
+                    ${userComplaints.map(complaint => `
+                        <div class="bg-white border rounded-lg p-6 shadow-sm">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h4 class="text-lg font-semibold text-gray-900">${complaint.subject}</h4>
+                                    <div class="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                                        <span>📅 ${complaint.createdAt.toLocaleDateString('es-ES')}</span>
+                                        <span>🏷️ ${getComplaintTypeText(complaint.type)}</span>
+                                        ${complaint.store ? `<span>🏪 ${complaint.store}</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium ${getPriorityClass(complaint.priority)}">${getPriorityText(complaint.priority)}</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(complaint.status)}">${getStatusText(complaint.status)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-gray-700">${complaint.description}</p>
+                                ${complaint.solution ? `<div class="mt-2 p-3 bg-blue-50 rounded-lg"><strong>Solución esperada:</strong> ${complaint.solution}</div>` : ''}
+                            </div>
+                            
+                            ${complaint.adminResponse ? `
+                                <div class="mt-4 p-4 bg-green-50 border-l-4 border-green-400 rounded-lg">
+                                    <h5 class="font-semibold text-green-800 mb-2">Respuesta del Centro Comercial:</h5>
+                                    <p class="text-green-700">${complaint.adminResponse}</p>
+                                    <p class="text-xs text-green-600 mt-2">Respondido el ${complaint.updatedAt.toLocaleDateString('es-ES')}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function loadAdminComplaints() {
+            if (currentUser.role !== 'admin') return;
+            
+            const container = document.getElementById('adminComplaintsList');
+            const pendingComplaints = complaints.filter(c => c.status === 'pendiente');
+            const allComplaints = complaints.slice().sort((a, b) => b.createdAt - a.createdAt);
+            
+            container.innerHTML = `
+                <div class="mb-6">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-yellow-800">📋 Resumen de Reclamaciones</h4>
+                        <div class="grid grid-cols-4 gap-4 mt-3 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-red-600">${pendingComplaints.length}</div>
+                                <div class="text-gray-600">Pendientes</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-yellow-600">${complaints.filter(c => c.status === 'en_proceso').length}</div>
+                                <div class="text-gray-600">En Proceso</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600">${complaints.filter(c => c.status === 'resuelto').length}</div>
+                                <div class="text-gray-600">Resueltas</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600">${complaints.length}</div>
+                                <div class="text-gray-600">Total</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    ${allComplaints.map(complaint => `
+                        <div class="bg-white border rounded-lg p-6 shadow-sm">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h4 class="text-lg font-semibold text-gray-900">${complaint.subject}</h4>
+                                    <div class="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                                        <span>👤 ${complaint.userName} (${complaint.userEmail})</span>
+                                        <span>📅 ${complaint.createdAt.toLocaleDateString('es-ES')}</span>
+                                        <span>🏷️ ${getComplaintTypeText(complaint.type)}</span>
+                                        ${complaint.store ? `<span>🏪 ${complaint.store}</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium ${getPriorityClass(complaint.priority)}">${getPriorityText(complaint.priority)}</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(complaint.status)}">${getStatusText(complaint.status)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-gray-700 mb-2">${complaint.description}</p>
+                                ${complaint.solution ? `<div class="p-3 bg-blue-50 rounded-lg"><strong>Solución esperada:</strong> ${complaint.solution}</div>` : ''}
+                            </div>
+                            
+                            ${complaint.status === 'pendiente' ? `
+                                <div class="border-t pt-4">
+                                    <h5 class="font-semibold mb-3">Responder Reclamación:</h5>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                                            <select id="status-${complaint.id}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                                <option value="en_proceso">En Proceso</option>
+                                                <option value="resuelto">Resuelto</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Respuesta al Cliente</label>
+                                            <textarea id="response-${complaint.id}" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Escribe la respuesta que verá el cliente..."></textarea>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Notas Internas (opcional)</label>
+                                            <textarea id="notes-${complaint.id}" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Notas para uso interno..."></textarea>
+                                        </div>
+                                        <button onclick="respondComplaint(${complaint.id})" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">Enviar Respuesta</button>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="border-t pt-4 bg-gray-50 rounded-lg p-3">
+                                    <h5 class="font-semibold text-gray-700 mb-2">Respuesta Enviada:</h5>
+                                    <p class="text-gray-600">${complaint.adminResponse}</p>
+                                    ${complaint.adminNotes ? `<p class="text-xs text-gray-500 mt-2"><strong>Notas:</strong> ${complaint.adminNotes}</p>` : ''}
+                                    <p class="text-xs text-gray-500 mt-1">Respondido el ${complaint.updatedAt.toLocaleDateString('es-ES')}</p>
+                                </div>
+                            `}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function respondComplaint(complaintId) {
+            const complaint = complaints.find(c => c.id === complaintId);
+            if (!complaint) return;
+            
+            const status = document.getElementById(`status-${complaintId}`).value;
+            const response = document.getElementById(`response-${complaintId}`).value;
+            const notes = document.getElementById(`notes-${complaintId}`).value;
+            
+            if (!response.trim()) {
+                alert('Debes escribir una respuesta para el cliente');
+                return;
+            }
+            
+            complaint.status = status;
+            complaint.adminResponse = response;
+            complaint.adminNotes = notes;
+            complaint.updatedAt = new Date();
+            
+            alert('✅ Respuesta enviada exitosamente');
+            loadAdminComplaints();
+        }
+
+        function getComplaintTypeText(type) {
+            const types = {
+                'servicio': 'Servicio al Cliente',
+                'producto': 'Producto Defectuoso',
+                'tienda': 'Problema con Tienda',
+                'instalaciones': 'Instalaciones',
+                'seguridad': 'Seguridad',
+                'limpieza': 'Limpieza',
+                'otros': 'Otros'
+            };
+            return types[type] || type;
+        }
+
+        function getPriorityText(priority) {
+            const priorities = {
+                'baja': '🟢 Baja',
+                'media': '🟡 Media',
+                'alta': '🟠 Alta',
+                'critica': '🔴 Crítica'
+            };
+            return priorities[priority] || priority;
+        }
+
+        function getPriorityClass(priority) {
+            const classes = {
+                'baja': 'bg-green-100 text-green-800',
+                'media': 'bg-yellow-100 text-yellow-800',
+                'alta': 'bg-orange-100 text-orange-800',
+                'critica': 'bg-red-100 text-red-800'
+            };
+            return classes[priority] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusText(status) {
+            const statuses = {
+                'pendiente': '⏳ Pendiente',
+                'en_proceso': '🔄 En Proceso',
+                'resuelto': '✅ Resuelto'
+            };
+            return statuses[status] || status;
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                'pendiente': 'bg-yellow-100 text-yellow-800',
+                'en_proceso': 'bg-blue-100 text-blue-800',
+                'resuelto': 'bg-green-100 text-green-800'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Advertisement Management
+        let advertisements = [
+            {
+                id: 1,
+                title: "Oferta Especial Moda",
+                description: "Hasta 70% de descuento en toda la colección",
+                position: "banner",
+                imageUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDgwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iMjAwIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfMF8xKSIvPgo8dGV4dCB4PSI0MDAiIHk9IjEwMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj7wn5OQIE9mZXJ0YSBFc3BlY2lhbCAtIDcwJSBPRkYg8J+TkDwvdGV4dD4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8wXzEiIHgxPSIwIiB5MT0iMCIgeDI9IjgwMCIgeTI9IjIwMCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjRkY2QjZCIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0ZGOEVBRSIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=",
+                url: "https://ejemplo.com/ofertas",
+                priority: "high",
+                startDate: new Date('2024-01-15T00:00:00'),
+                endDate: new Date('2024-02-15T23:59:59'),
+                active: true,
+                views: 1250,
+                clicks: 89,
+                createdAt: new Date('2024-01-14T10:00:00')
+            },
+            {
+                id: 2,
+                title: "Tecnología Premium",
+                description: "Los últimos smartphones y gadgets",
+                position: "sidebar",
+                imageUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDMwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iNDAwIiBmaWxsPSJ1cmwoI3BhaW50MF9saW5lYXJfMF8xKSIvPgo8dGV4dCB4PSIxNTAiIHk9IjE4MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj7wn5OBIE51ZXZhPC90ZXh0Pgo8dGV4dCB4PSIxNTAiIHk9IjIxMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5UZWNub2xvZ8OtYTwvdGV4dD4KPGR1Zz4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzBfMSIgeDE9IjAiIHkxPSIwIiB4Mj0iMzAwIiB5Mj0iNDAwIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM0RjQ2RTUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN0M0REZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==",
+                url: "https://ejemplo.com/tech",
+                priority: "medium",
+                startDate: new Date('2024-01-10T00:00:00'),
+                endDate: new Date('2024-03-10T23:59:59'),
+                active: true,
+                views: 890,
+                clicks: 45,
+                createdAt: new Date('2024-01-09T15:30:00')
+            }
+        ];
+        let nextAdId = 3;
+        let adViewCounts = {};
+        let totalPageViews = 2500; // Simulated total page views
+
+        // Advertisement Functions
+        function openAdsManager() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Acceso denegado. Solo administradores pueden gestionar anuncios.');
+                return;
+            }
+            document.getElementById('adsManagerModal').classList.add('show');
+            loadAdsStats();
+            loadActiveAds();
+            setDefaultAdDates();
+        }
+
+        function closeAdsManager() {
+            document.getElementById('adsManagerModal').classList.remove('show');
+        }
+
+        function setDefaultAdDates() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('adStartDate').value = now.toISOString().slice(0, 16);
+            
+            const endDate = new Date(now);
+            endDate.setMonth(endDate.getMonth() + 1);
+            endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
+            document.getElementById('adEndDate').value = endDate.toISOString().slice(0, 16);
+        }
+
+        function loadAdsStats() {
+            const activeAds = advertisements.filter(ad => ad.active && isAdActive(ad));
+            const totalViews = advertisements.reduce((sum, ad) => sum + ad.views, 0);
+            const totalClicks = advertisements.reduce((sum, ad) => sum + ad.clicks, 0);
+            const avgCTR = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : 0;
+            
+            document.getElementById('adsStats').innerHTML = `
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-orange-600">${activeAds.length}</div>
+                    <div class="text-sm text-gray-600">Anuncios Activos</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-blue-600">${totalViews.toLocaleString()}</div>
+                    <div class="text-sm text-gray-600">Visualizaciones</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600">${totalClicks}</div>
+                    <div class="text-sm text-gray-600">Clics</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-purple-600">${avgCTR}%</div>
+                    <div class="text-sm text-gray-600">CTR Promedio</div>
+                </div>
+            `;
+        }
+
+        function previewAdFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('El archivo es demasiado grande. El tamaño máximo es 5MB.');
+                input.value = '';
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor selecciona un archivo de imagen válido.');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('adPreview');
+                const img = document.getElementById('adPreviewImg');
+                
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function uploadAd(event) {
+            event.preventDefault();
+            
+            const file = document.getElementById('adFile').files[0];
+            if (!file) {
+                alert('Por favor selecciona un archivo de imagen');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const startDate = new Date(document.getElementById('adStartDate').value);
+                const endDate = document.getElementById('adEndDate').value ? new Date(document.getElementById('adEndDate').value) : null;
+                
+                if (endDate && endDate <= startDate) {
+                    alert('La fecha de fin debe ser posterior a la fecha de inicio');
+                    return;
+                }
+                
+                const newAd = {
+                    id: nextAdId++,
+                    title: document.getElementById('adTitle').value,
+                    description: document.getElementById('adDescription').value,
+                    position: document.getElementById('adPosition').value,
+                    imageUrl: e.target.result,
+                    url: document.getElementById('adUrl').value,
+                    priority: document.getElementById('adPriority').value,
+                    startDate: startDate,
+                    endDate: endDate,
+                    active: true,
+                    views: 0,
+                    clicks: 0,
+                    createdAt: new Date()
+                };
+                
+                advertisements.push(newAd);
+                loadAdsStats();
+                loadActiveAds();
+                clearAdForm();
+                refreshAdsDisplay();
+                alert('✅ Anuncio subido exitosamente');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearAdForm() {
+            document.getElementById('adTitle').value = '';
+            document.getElementById('adDescription').value = '';
+            document.getElementById('adPosition').value = '';
+            document.getElementById('adFile').value = '';
+            document.getElementById('adUrl').value = '';
+            document.getElementById('adPriority').value = 'medium';
+            document.getElementById('adPreview').style.display = 'none';
+            setDefaultAdDates();
+        }
+
+        function loadActiveAds() {
+            const container = document.getElementById('activeAdsList');
+            
+            if (advertisements.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <p class="text-lg font-medium">No hay anuncios configurados</p>
+                        <p class="text-sm">Sube el primer anuncio usando el formulario de arriba</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedAds = advertisements.slice().sort((a, b) => b.createdAt - a.createdAt);
+            
+            container.innerHTML = `
+                <div class="space-y-4">
+                    ${sortedAds.map(ad => {
+                        const isActive = ad.active && isAdActive(ad);
+                        const viewPercentage = totalPageViews > 0 ? ((ad.views / totalPageViews) * 100).toFixed(1) : 0;
+                        const ctr = ad.views > 0 ? ((ad.clicks / ad.views) * 100).toFixed(2) : 0;
+                        
+                        return `
+                            <div class="bg-white border rounded-lg p-6 shadow-sm ${!isActive ? 'opacity-60' : ''}">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-start space-x-4">
+                                        <img src="${ad.imageUrl}" alt="${ad.title}" class="w-20 h-16 object-cover rounded border">
+                                        <div>
+                                            <h5 class="text-lg font-semibold text-gray-900">${ad.title}</h5>
+                                            <p class="text-sm text-gray-600 mb-2">${ad.description}</p>
+                                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                                <span>📍 ${getPositionText(ad.position)}</span>
+                                                <span>📅 ${ad.startDate.toLocaleDateString('es-ES')}</span>
+                                                ${ad.url ? `<span>🔗 <a href="${ad.url}" target="_blank" class="text-blue-600 hover:underline">Ver URL</a></span>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-3 py-1 rounded-full text-xs font-medium ${getPriorityClass(ad.priority)}">${getPriorityText(ad.priority)}</span>
+                                        <span class="px-3 py-1 rounded-full text-xs font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${isActive ? '✅ Activo' : '❌ Inactivo'}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Statistics -->
+                                <div class="grid grid-cols-4 gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-blue-600">${ad.views.toLocaleString()}</div>
+                                        <div class="text-xs text-gray-600">Visualizaciones</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-green-600">${ad.clicks}</div>
+                                        <div class="text-xs text-gray-600">Clics</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-purple-600">${viewPercentage}%</div>
+                                        <div class="text-xs text-gray-600">% de Personas</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-orange-600">${ctr}%</div>
+                                        <div class="text-xs text-gray-600">CTR</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-600">
+                                        ${ad.endDate ? `⏰ Expira: ${ad.endDate.toLocaleDateString('es-ES')}` : '⏰ Sin expiración'}
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button onclick="toggleAdStatus(${ad.id})" class="text-${ad.active ? 'red' : 'green'}-600 hover:text-${ad.active ? 'red' : 'green'}-800 p-1" title="${ad.active ? 'Desactivar' : 'Activar'}">
+                                            ${ad.active ? 
+                                                '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path></svg>' :
+                                                '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+                                            }
+                                        </button>
+                                        <button onclick="deleteAd(${ad.id})" class="text-red-600 hover:text-red-800 p-1" title="Eliminar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function getPositionText(position) {
+            const positions = {
+                'banner': '🔝 Banner Superior',
+                'sidebar': '📱 Barra Lateral',
+                'inline-1': '📄 Entre Contenido 1',
+                'inline-2': '📄 Entre Contenido 2'
+            };
+            return positions[position] || position;
+        }
+
+        function isAdActive(ad) {
+            const now = new Date();
+            return now >= ad.startDate && (!ad.endDate || now <= ad.endDate);
+        }
+
+        function toggleAdStatus(adId) {
+            const ad = advertisements.find(a => a.id === adId);
+            if (!ad) return;
+            
+            ad.active = !ad.active;
+            loadAdsStats();
+            loadActiveAds();
+            refreshAdsDisplay();
+            
+            alert(`✅ Anuncio ${ad.active ? 'activado' : 'desactivado'} exitosamente`);
+        }
+
+        function deleteAd(adId) {
+            const ad = advertisements.find(a => a.id === adId);
+            if (!ad) return;
+            
+            if (confirm(`¿Estás seguro de que quieres eliminar el anuncio "${ad.title}"?`)) {
+                advertisements = advertisements.filter(a => a.id !== adId);
+                loadAdsStats();
+                loadActiveAds();
+                refreshAdsDisplay();
+                alert('✅ Anuncio eliminado exitosamente');
+            }
+        }
+
+        function refreshAdsDisplay() {
+            displayAdsInPositions();
+        }
+
+        function displayAdsInPositions() {
+            const positions = ['banner', 'sidebar', 'inline-1', 'inline-2'];
+            
+            positions.forEach(position => {
+                const activeAds = advertisements.filter(ad => 
+                    ad.active && 
+                    ad.position === position && 
+                    isAdActive(ad)
+                );
+                
+                if (activeAds.length > 0) {
+                    // Sort by priority and show the highest priority ad
+                    const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+                    const selectedAd = activeAds.sort((a, b) => 
+                        priorityOrder[b.priority] - priorityOrder[a.priority]
+                    )[0];
+                    
+                    displayAdInPosition(selectedAd, position);
+                    
+                    // Increment view count
+                    selectedAd.views++;
+                } else {
+                    hideAdInPosition(position);
+                }
+            });
+        }
+
+        function displayAdInPosition(ad, position) {
+            let containerId;
+            switch(position) {
+                case 'banner':
+                    containerId = 'ad-banner-content';
+                    break;
+                case 'sidebar':
+                    containerId = 'sidebar-ad-content';
+                    break;
+                case 'inline-1':
+                    containerId = 'inline-ad-1-content';
+                    break;
+                case 'inline-2':
+                    containerId = 'inline-ad-2-content';
+                    break;
+            }
+            
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const clickHandler = ad.url ? `onclick="handleAdClick(${ad.id}, '${ad.url}')"` : '';
+            const cursorStyle = ad.url ? 'cursor: pointer;' : '';
+            
+            container.innerHTML = `
+                <div ${clickHandler} style="${cursorStyle}" class="relative group">
+                    <img src="${ad.imageUrl}" alt="${ad.title}" class="w-full h-auto rounded ${ad.url ? 'hover:opacity-90 transition-opacity' : ''}">
+                    <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                        Anuncio
+                    </div>
+                    ${ad.url ? '<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded"></div>' : ''}
+                </div>
+            `;
+            
+            // Show the ad container
+            document.getElementById(containerId.replace('-content', '')).style.display = 'block';
+        }
+
+        function hideAdInPosition(position) {
+            let containerId;
+            switch(position) {
+                case 'banner':
+                    containerId = 'ad-banner';
+                    break;
+                case 'sidebar':
+                    containerId = 'sidebar-ad';
+                    break;
+                case 'inline-1':
+                    containerId = 'inline-ad-1';
+                    break;
+                case 'inline-2':
+                    containerId = 'inline-ad-2';
+                    break;
+            }
+            
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.style.display = 'none';
+            }
+        }
+
+        function handleAdClick(adId, url) {
+            const ad = advertisements.find(a => a.id === adId);
+            if (ad) {
+                ad.clicks++;
+            }
+            
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+
+        // Function to display stores in the main section
+        function displayStoresInSection() {
+            const container = document.getElementById('stores-display');
+            if (!container) return;
+            
+            container.innerHTML = stores.map(store => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover border-l-4 border-${store.color}-500">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-16 h-16 bg-${store.color}-500 rounded-lg flex items-center justify-center mr-4 overflow-hidden ${store.website ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}" ${store.website ? `onclick="visitStoreWebsite('${store.website}')"` : ''} title="${store.website ? 'Clic para visitar sitio web' : ''}">
+                                ${store.logoType === 'image' && store.logoImage ? 
+                                    `<img src="${store.logoImage}" alt="${store.name}" class="w-full h-full object-cover">` : 
+                                    `<span class="text-white text-2xl">${store.icon}</span>`
+                                }
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-1 ${store.website ? 'cursor-pointer hover:text-purple-600 transition-colors' : ''}" ${store.website ? `onclick="visitStoreWebsite('${store.website}')"` : ''} title="${store.website ? 'Clic para visitar sitio web' : ''}">${store.name}</h3>
+                                <p class="text-sm text-gray-600 mb-2">Piso ${store.floor} - Local ${store.local}</p>
+                                ${store.website ? `<p class="text-xs text-blue-600 hover:underline cursor-pointer" onclick="visitStoreWebsite('${store.website}')" title="Visitar sitio web">🌐 ${store.website}</p>` : ''}
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">${store.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-${store.color}-600 bg-${store.color}-100 px-3 py-1 rounded-full">${store.category}</span>
+                            <span class="text-sm ${store.status === 'activa' ? 'text-green-600' : store.status === 'mantenimiento' ? 'text-yellow-600' : 'text-red-600'}">${getStatusText(store.status)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize ads display when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserSession();
+            checkForUpdates();
+            displayAdsInPositions();
+            displayStoresInSection();
+            
+            // Simulate page views for statistics
+            totalPageViews++;
+        });
+
+        // Web Updates Management
+        let webUpdates = [
+            {
+                id: 1,
+                title: "Mejoras en el Sistema de Tiendas",
+                type: "improvement",
+                description: "Hemos mejorado la gestión de tiendas con nuevas funcionalidades de logos personalizados",
+                url: "https://cclille.com/updates/v1.2",
+                priority: "medium",
+                publishDate: new Date('2024-01-20T09:00:00'),
+                expiryDate: new Date('2024-02-20T23:59:59'),
+                autoShow: true,
+                forceUpdate: false,
+                active: true,
+                createdBy: "admin@cclille.com",
+                createdAt: new Date('2024-01-19T15:30:00')
+            }
+        ];
+        let nextUpdateId = 2;
+        let currentUpdateUrl = null;
+
+        // Web Updates Functions
+        function openWebUpdates() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Acceso denegado. Solo administradores pueden gestionar actualizaciones.');
+                return;
+            }
+            document.getElementById('webUpdatesModal').classList.add('show');
+            loadUpdateStatus();
+            loadActiveUpdates();
+            setDefaultPublishDate();
+        }
+
+        function closeWebUpdates() {
+            document.getElementById('webUpdatesModal').classList.remove('show');
+        }
+
+        function setDefaultPublishDate() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('updatePublishDate').value = now.toISOString().slice(0, 16);
+        }
+
+        function loadUpdateStatus() {
+            const activeUpdates = webUpdates.filter(u => u.active && new Date() >= u.publishDate && (!u.expiryDate || new Date() <= u.expiryDate));
+            const statusContainer = document.getElementById('updateStatus');
+            
+            if (activeUpdates.length === 0) {
+                statusContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <p class="text-blue-600">✅ No hay actualizaciones activas</p>
+                        <p class="text-sm text-blue-500 mt-1">Los usuarios no verán notificaciones de actualización</p>
+                    </div>
+                `;
+            } else {
+                statusContainer.innerHTML = `
+                    <div class="space-y-2">
+                        <p class="font-medium">📢 ${activeUpdates.length} actualización(es) activa(s)</p>
+                        ${activeUpdates.map(update => `
+                            <div class="text-sm bg-white p-2 rounded border-l-4 ${getPriorityBorderClass(update.priority)}">
+                                <strong>${update.title}</strong> - ${getPriorityText(update.priority)}
+                                ${update.autoShow ? '<span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Auto-mostrar</span>' : ''}
+                                ${update.forceUpdate ? '<span class="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Obligatoria</span>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        function loadActiveUpdates() {
+            const container = document.getElementById('activeUpdatesList');
+            
+            if (webUpdates.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <p class="text-lg font-medium">No hay actualizaciones configuradas</p>
+                        <p class="text-sm">Configura la primera actualización usando el formulario de arriba</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedUpdates = webUpdates.slice().sort((a, b) => b.createdAt - a.createdAt);
+            
+            container.innerHTML = `
+                <div class="space-y-4">
+                    ${sortedUpdates.map(update => `
+                        <div class="bg-white border rounded-lg p-6 shadow-sm ${!update.active ? 'opacity-60' : ''}">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h5 class="text-lg font-semibold text-gray-900">${update.title}</h5>
+                                    <div class="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                                        <span>📅 ${update.publishDate.toLocaleDateString('es-ES')}</span>
+                                        <span>🏷️ ${getUpdateTypeText(update.type)}</span>
+                                        <span>🔗 <a href="${update.url}" target="_blank" class="text-blue-600 hover:underline">Ver URL</a></span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium ${getPriorityClass(update.priority)}">${getPriorityText(update.priority)}</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium ${update.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${update.active ? '✅ Activa' : '❌ Inactiva'}</span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-700 mb-4">${update.description}</p>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                    ${update.autoShow ? '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Auto-mostrar</span>' : ''}
+                                    ${update.forceUpdate ? '<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Obligatoria</span>' : ''}
+                                    ${update.expiryDate ? `<span>⏰ Expira: ${update.expiryDate.toLocaleDateString('es-ES')}</span>` : '<span>⏰ Sin expiración</span>'}
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="toggleUpdateStatus(${update.id})" class="text-${update.active ? 'red' : 'green'}-600 hover:text-${update.active ? 'red' : 'green'}-800 p-1" title="${update.active ? 'Desactivar' : 'Activar'}">
+                                        ${update.active ? 
+                                            '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path></svg>' :
+                                            '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+                                        }
+                                    </button>
+                                    <button onclick="editUpdate(${update.id})" class="text-blue-600 hover:text-blue-800 p-1" title="Editar">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <button onclick="deleteUpdate(${update.id})" class="text-red-600 hover:text-red-800 p-1" title="Eliminar">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function configureWebUpdate(event) {
+            event.preventDefault();
+            
+            const publishDate = new Date(document.getElementById('updatePublishDate').value);
+            const expiryDate = document.getElementById('updateExpiryDate').value ? new Date(document.getElementById('updateExpiryDate').value) : null;
+            
+            if (expiryDate && expiryDate <= publishDate) {
+                alert('La fecha de expiración debe ser posterior a la fecha de publicación');
+                return;
+            }
+            
+            const newUpdate = {
+                id: nextUpdateId++,
+                title: document.getElementById('updateTitle').value,
+                type: document.getElementById('updateType').value,
+                description: document.getElementById('updateDescription').value,
+                url: document.getElementById('updateUrl').value,
+                priority: document.getElementById('updatePriority').value,
+                publishDate: publishDate,
+                expiryDate: expiryDate,
+                autoShow: document.getElementById('updateAutoShow').checked,
+                forceUpdate: document.getElementById('updateForceUpdate').checked,
+                active: true,
+                createdBy: currentUser.email,
+                createdAt: new Date()
+            };
+            
+            webUpdates.push(newUpdate);
+            loadUpdateStatus();
+            loadActiveUpdates();
+            clearUpdateForm();
+            alert('✅ Actualización configurada exitosamente');
+        }
+
+        function clearUpdateForm() {
+            document.getElementById('updateTitle').value = '';
+            document.getElementById('updateType').value = '';
+            document.getElementById('updateDescription').value = '';
+            document.getElementById('updateUrl').value = '';
+            document.getElementById('updatePriority').value = 'medium';
+            document.getElementById('updateExpiryDate').value = '';
+            document.getElementById('updateAutoShow').checked = true;
+            document.getElementById('updateForceUpdate').checked = false;
+            setDefaultPublishDate();
+        }
+
+        function testUpdateNotification() {
+            const title = document.getElementById('updateTitle').value || 'Título de prueba';
+            const description = document.getElementById('updateDescription').value || 'Descripción de prueba';
+            const priority = document.getElementById('updatePriority').value || 'medium';
+            const url = document.getElementById('updateUrl').value || 'https://ejemplo.com';
+            
+            showUpdateNotification({
+                title: title,
+                description: description,
+                priority: priority,
+                url: url,
+                forceUpdate: document.getElementById('updateForceUpdate').checked
+            });
+        }
+
+        function toggleUpdateStatus(updateId) {
+            const update = webUpdates.find(u => u.id === updateId);
+            if (!update) return;
+            
+            update.active = !update.active;
+            loadUpdateStatus();
+            loadActiveUpdates();
+            
+            alert(`✅ Actualización ${update.active ? 'activada' : 'desactivada'} exitosamente`);
+        }
+
+        function editUpdate(updateId) {
+            const update = webUpdates.find(u => u.id === updateId);
+            if (!update) return;
+            
+            // Fill form with update data
+            document.getElementById('updateTitle').value = update.title;
+            document.getElementById('updateType').value = update.type;
+            document.getElementById('updateDescription').value = update.description;
+            document.getElementById('updateUrl').value = update.url;
+            document.getElementById('updatePriority').value = update.priority;
+            
+            // Format dates for datetime-local input
+            const publishDate = new Date(update.publishDate);
+            publishDate.setMinutes(publishDate.getMinutes() - publishDate.getTimezoneOffset());
+            document.getElementById('updatePublishDate').value = publishDate.toISOString().slice(0, 16);
+            
+            if (update.expiryDate) {
+                const expiryDate = new Date(update.expiryDate);
+                expiryDate.setMinutes(expiryDate.getMinutes() - expiryDate.getTimezoneOffset());
+                document.getElementById('updateExpiryDate').value = expiryDate.toISOString().slice(0, 16);
+            }
+            
+            document.getElementById('updateAutoShow').checked = update.autoShow;
+            document.getElementById('updateForceUpdate').checked = update.forceUpdate;
+            
+            // Change form behavior to update instead of create
+            const form = document.querySelector('#webUpdatesModal form');
+            form.onsubmit = function(event) {
+                event.preventDefault();
+                updateWebUpdate(updateId);
+            };
+            
+            // Scroll to form
+            document.querySelector('#webUpdatesModal form').scrollIntoView({ behavior: 'smooth' });
+            alert('📝 Formulario cargado para edición. Modifica los campos y guarda los cambios.');
+        }
+
+        function updateWebUpdate(updateId) {
+            const updateIndex = webUpdates.findIndex(u => u.id === updateId);
+            if (updateIndex === -1) return;
+            
+            const publishDate = new Date(document.getElementById('updatePublishDate').value);
+            const expiryDate = document.getElementById('updateExpiryDate').value ? new Date(document.getElementById('updateExpiryDate').value) : null;
+            
+            if (expiryDate && expiryDate <= publishDate) {
+                alert('La fecha de expiración debe ser posterior a la fecha de publicación');
+                return;
+            }
+            
+            webUpdates[updateIndex] = {
+                ...webUpdates[updateIndex],
+                title: document.getElementById('updateTitle').value,
+                type: document.getElementById('updateType').value,
+                description: document.getElementById('updateDescription').value,
+                url: document.getElementById('updateUrl').value,
+                priority: document.getElementById('updatePriority').value,
+                publishDate: publishDate,
+                expiryDate: expiryDate,
+                autoShow: document.getElementById('updateAutoShow').checked,
+                forceUpdate: document.getElementById('updateForceUpdate').checked
+            };
+            
+            loadUpdateStatus();
+            loadActiveUpdates();
+            clearUpdateForm();
+            resetUpdateForm();
+            alert('✅ Actualización modificada exitosamente');
+        }
+
+        function resetUpdateForm() {
+            const form = document.querySelector('#webUpdatesModal form');
+            form.onsubmit = configureWebUpdate;
+        }
+
+        function deleteUpdate(updateId) {
+            const update = webUpdates.find(u => u.id === updateId);
+            if (!update) return;
+            
+            if (confirm(`¿Estás seguro de que quieres eliminar la actualización "${update.title}"?`)) {
+                webUpdates = webUpdates.filter(u => u.id !== updateId);
+                loadUpdateStatus();
+                loadActiveUpdates();
+                alert('✅ Actualización eliminada exitosamente');
+            }
+        }
+
+        function getUpdateTypeText(type) {
+            const types = {
+                'feature': '✨ Nueva Funcionalidad',
+                'improvement': '🔧 Mejora',
+                'bugfix': '🐛 Corrección',
+                'maintenance': '⚙️ Mantenimiento',
+                'security': '🔒 Seguridad'
+            };
+            return types[type] || type;
+        }
+
+        function getPriorityBorderClass(priority) {
+            const classes = {
+                'low': 'border-green-400',
+                'medium': 'border-yellow-400',
+                'high': 'border-orange-400',
+                'critical': 'border-red-400'
+            };
+            return classes[priority] || 'border-gray-400';
+        }
+
+        // Check for updates when user logs in or page loads
+        function checkForUpdates() {
+            if (!currentUser) return;
+            
+            const now = new Date();
+            const activeUpdates = webUpdates.filter(u => 
+                u.active && 
+                u.autoShow && 
+                now >= u.publishDate && 
+                (!u.expiryDate || now <= u.expiryDate)
+            );
+            
+            if (activeUpdates.length > 0) {
+                // Show the highest priority update
+                const priorityOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1 };
+                const highestPriorityUpdate = activeUpdates.sort((a, b) => 
+                    priorityOrder[b.priority] - priorityOrder[a.priority]
+                )[0];
+                
+                // Check if user has already seen this update today
+                const lastShown = localStorage.getItem(`update_shown_${highestPriorityUpdate.id}`);
+                const today = new Date().toDateString();
+                
+                if (lastShown !== today || highestPriorityUpdate.forceUpdate) {
+                    setTimeout(() => {
+                        showUpdateNotification(highestPriorityUpdate);
+                        localStorage.setItem(`update_shown_${highestPriorityUpdate.id}`, today);
+                    }, 2000); // Show after 2 seconds
+                }
+            }
+        }
+
+        function showUpdateNotification(update) {
+            currentUpdateUrl = update.url;
+            
+            document.getElementById('updateNotificationTitle').textContent = update.title;
+            document.getElementById('updateNotificationDescription').textContent = update.description;
+            
+            const badge = document.getElementById('updateNotificationBadge');
+            badge.textContent = getPriorityText(update.priority);
+            badge.className = `inline-block px-3 py-1 rounded-full text-xs font-medium mb-4 ${getPriorityClass(update.priority)}`;
+            
+            // Handle forced updates
+            const laterButton = document.getElementById('updateNotificationLater');
+            if (update.forceUpdate) {
+                laterButton.style.display = 'none';
+                document.getElementById('updateNotificationButton').textContent = 'Actualizar Ahora (Obligatorio)';
+            } else {
+                laterButton.style.display = 'block';
+                document.getElementById('updateNotificationButton').textContent = 'Actualizar Ahora';
+            }
+            
+            document.getElementById('updateNotificationModal').classList.add('show');
+        }
+
+        function closeUpdateNotification() {
+            document.getElementById('updateNotificationModal').classList.remove('show');
+            currentUpdateUrl = null;
+        }
+
+        function goToUpdate() {
+            if (currentUpdateUrl) {
+                window.open(currentUpdateUrl, '_blank', 'noopener,noreferrer');
+                closeUpdateNotification();
+            }
+        }
+
+        // Update checkUserSession to check for updates after login
+        function checkUserSession() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserInterface();
+                checkForUpdates();
+            }
+        }
+
+        // Navigation function
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        // Show schedule function
+        function showSchedule() {
+            alert(`🕐 HORARIOS DE CCLille\n\n📅 Lunes a Sábado: 10:00 - 22:00\n📅 Domingos: 11:00 - 20:00\n\n🎬 Cine: Hasta las 24:00\n🍽️ Restaurantes: Hasta las 23:00\n\n🅿️ Aparcamiento: 24 horas`);
+        }
+
+        // Placeholder functions for other features
+        function openNotifications() {
+            alert('Sistema de notificaciones - Próximamente');
+        }
+
+        function openCart() {
+            alert('Carrito de compras - Próximamente');
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a83d4f7c17c030f',t:'MTc2NDc3Mjk2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
